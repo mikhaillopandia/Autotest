@@ -1,5 +1,6 @@
 require "selenium-webdriver"
 
+
 def tc_01
   driver = Selenium::WebDriver.for :chrome
   driver.navigate.to 'http://demoapp.strongqa.com/'
@@ -120,4 +121,4 @@ tc_05_2
 tc_05_3
 =end
 
-tc_05_3
+tc_01
