@@ -1,124 +1,153 @@
-require "selenium-webdriver"
+Bundler.require(:default)
 
+@login_page = 'http://demoapp.strongqa.com/users/sign_in'
+@home_page = 'http://demoapp.strongqa.com/'
 
-def tc_01
-  driver = Selenium::WebDriver.for :chrome
-  driver.navigate.to 'http://demoapp.strongqa.com/'
-  element = driver.find_element(link_text: 'Login')
-  element.click
-  driver.quit
+def test_case(ref, name)
+  @driver = Selenium::WebDriver.for :chrome
+  puts "**#{ref} - #{name}"
+  yield
+rescue => e
+  puts "[FAILED] #{e.message}"
+ensure
+  @driver.quit
 end
 
-def tc_02
-  driver = Selenium::WebDriver.for :chrome
-  driver.navigate.to 'http://demoapp.strongqa.com/users/sign_in'
-  driver.find_element(name: 'user[email]').send_key 'lopandya96@gmail.com'
-  driver.find_element(name: 'user[password]').send_keys('lopandya96', :enter)
-  driver
+def visit_login_page
+  puts " Action: Visit login page"
+  @driver.navigate.to @login_page
 end
 
-def tc_03_1
-  driver = Selenium::WebDriver.for :chrome
-  driver.navigate.to 'http://demoapp.strongqa.com/users/sign_in'
-  driver.find_element(name: 'user[email]').send_key('lopandya96@gmail.com')
-  # driver.find_element(name: 'user[remember_me]').click
-  # sleep 5
-  # it doesn't work!
-  driver.find_element(name: 'user[password]').send_keys('lopandya96')
-  driver
+def visit_home_page
+  puts " Action: Visit home page"
+  @driver.navigate.to @home_page
 end
 
-def tc_03_2
-  driver = tc_03_1
-  driver.quit
-
-  driver = tc_02
-  l = driver.find_element(class: 'navbar-brand')
-  l.click
-  driver
+def assert_login_page_open
+  puts "  Verify: login page should be open"
+  if @driver.current_url == @login_page
+    puts '[PASS]'
+  else
+    raise "Expected Login page, Actual: #{@driver.current_url}"
+  end
 end
 
-def tc_03_3
-  driver = tc_03_1
-  # driver.find_element(xpath: "//*[@data-method= 'delete']").click
-  # driver.find_element(link_text: "Logout").click
-  # doesn't work!
-  driver.quit
-  driver = tc_02
-  driver.find_element(class: 'navbar-brand').click
-  driver.quit
+def assert_home_page_open
+  puts "  Verify: home page should be open"
+  if @driver.current_url == @home_page
+    puts '[PASS]'
+  else
+    raise "Expected Home page, Actual: #{@driver.current_url}"
+  end
 end
 
-
-def tc_04_1
-  driver = Selenium::WebDriver.for :chrome
-  driver.navigate.to 'http://demoapp.strongqa.com/users/sign_in'
-  driver.find_element(name: 'user[email]').send_keys('lopandya96@gmail.com', :enter)
-  d = driver.find_element(id: 'flash_alert')
-  puts !!d ? 'OK' : 'Fail'
-  driver.quit
+def assert_user_logged
+  puts "  Verify: User should be logged on"
+  e = @driver.find_element(xpath: "//div[text()='Signed in successfully.']")
+  if !!e
+    puts '[PASS]'
+  else
+    raise "There is no 'Signed in successfully.' on the page"
+  end
 end
 
-def tc_04_2
-  driver = Selenium::WebDriver.for :chrome
-  driver.navigate.to 'http://demoapp.strongqa.com/users/sign_in'
-  driver.find_element(name: 'user[password]').send_keys('lopandya96', :enter)
-  d = driver.find_element(id: 'flash_alert')
-  puts !!d ? 'OK' : 'Fail'
-  driver.quit
+def assert_login_error_message
+  puts "  Verify: Login error message exists"
+  e = @driver.find_element(xpath: "//div[text()='Invalid email or password.']")
+  if !!e
+    puts '[PASS]'
+  else
+    raise "There is no 'Invalid email or password.' on the page"
+  end
 end
 
-def tc_04_3
-  driver = Selenium::WebDriver.for :chrome
-  driver.navigate.to 'http://demoapp.strongqa.com/users/sign_in'
-  d = driver.find_element(id: 'flash_alert')
-  puts !!d ? 'OK' : 'Fail'
-  driver.quit
+def assert_login_interrupted
+  puts "  Verify: User isn't logged on"
+  e = @driver.find_element(xpath: "//a[text()='Login']")
+  if !!e
+    puts '[PASS]'
+  else
+    raise "User has been logged on!"
+  end
 end
 
-
-def tc_05_1
-  driver = Selenium::WebDriver.for :chrome
-  driver.navigate.to 'http://demoapp.strongqa.com/users/sign_in'
-  driver.find_element(name: 'user[email]').send_key('FALSE@i.ua')
-  driver.find_element(name: 'user[password]').send_keys('lopandya96', :enter)
-  d = driver.find_element(id: 'flash_alert')
-  puts !!d ? 'OK' : 'Fail'
-  driver.quit
+def assert_login_error
+  assert_login_error_message
+  assert_login_interrupted
 end
 
-def tc_05_2
-  driver = Selenium::WebDriver.for :chrome
-  driver.navigate.to 'http://demoapp.strongqa.com/users/sign_in'
-  driver.find_element(name: 'user[email]').send_key('lopandya96@gmail.com')
-  driver.find_element(name: 'user[password]').send_keys('FALSE', :enter)
-  d = driver.find_element(id: 'flash_alert')
-  puts !!d ? 'OK' : 'Fail'
-  driver.quit
+def click_login
+  puts ' Action: Click on Login item'
+  @driver.find_element(link_text: 'Login').click
 end
 
-def tc_05_3
-  driver = Selenium::WebDriver.for :chrome
-  driver.navigate.to 'http://demoapp.strongqa.com/users/sign_in'
-  driver.find_element(name: 'user[email]').send_key('FALSE@i.ua')
-  driver.find_element(name: 'user[password]').send_keys('FALSE', :enter)
-  d = driver.find_element(id: 'flash_alert')
-  puts !!d ? 'OK' : 'Fail'
-  driver.quit
+def click_enter
+  puts ' Action: Click Enter'
+  @driver.find_element(name: 'user[password]').send_keys(:enter)
 end
 
-=begin
-tc_01
-tc_02
-tc_03_1
-tc_03_2
-tc_03_3
-tc_04_1
-tc_04_2
-tc_04_3
-tc_05_1
-tc_05_2
-tc_05_3
-=end
+def fill_form (email: nil, password: nil)
+  puts " Action: Filling in: email = #{email}, password = #{password}"
+  @driver.find_element(name: 'user[email]').send_key(email)
+  @driver.find_element(name: 'user[password]').send_key(password)
+end
 
-tc_01
+def selenium_test_run
+  test_case 'tc_01', 'User can open login page via menu' do
+    visit_home_page
+    click_login
+    assert_login_page_open
+  end
+
+  test_case 'tc_02', 'User can login with correct credentials' do
+    visit_login_page
+    fill_form(email: 'lopandya96@gmail.com', password: 'lopandya96')
+    click_enter
+    assert_user_logged
+    assert_home_page_open
+  end
+
+  test_case 'tc_04.1', 'User can not login with blank password' do
+    visit_login_page
+    fill_form(email: 'lopandya96@gmail.com', password: '')
+    click_enter
+    assert_login_error
+  end
+
+  test_case 'tc_04.2', 'User can not login with blank email' do
+    visit_login_page
+    fill_form(email: '', password: 'lopandya96')
+    click_enter
+    assert_login_error
+  end
+
+  test_case 'tc_04.3', 'User can not login with blank data' do
+    visit_login_page
+    fill_form(email: '', password: '')
+    click_enter
+    assert_login_error
+  end
+
+  test_case 'tc_05.1', 'User can not login with incorrect email' do
+    visit_login_page
+    fill_form(email: 'FASLE@i.ua', password: 'lopandya96')
+    click_enter
+    assert_login_error
+  end
+
+  test_case 'tc_05.2', 'User can not login with incorrect password' do
+    visit_login_page
+    fill_form(email: 'lopandya96@i.ua', password: 'FALSE')
+    click_enter
+    assert_login_error
+  end
+
+  test_case 'tc_05.3', 'User can not login with incorrect data' do
+    visit_login_page
+    fill_form(email: 'FALSE@i.ua', password: 'FALSE')
+    click_enter
+    assert_login_error
+  end
+end
+
+selenium_test_run

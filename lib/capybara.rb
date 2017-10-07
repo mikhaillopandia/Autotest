@@ -24,7 +24,6 @@ def visit_home_page
   visit('/')
 end
 
-
 def assert_login_page_open
   puts "  Verify: login page should be open"
   if current_path == '/users/sign_in'
@@ -84,6 +83,7 @@ def click_login
 end
 
 def click_enter
+  puts ' Action: Click Enter'
   find_field('user[password]').send_keys(:enter)
 end
 
