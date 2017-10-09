@@ -3,9 +3,13 @@ require_relative 'lib/capybara'
 require_relative 'lib/selenium'
 require_relative 'lib/watir'
 
-allowed_drivers = ['capybara', 'selenium', 'watir']
-puts 'Enter drivers names you want to use for the test, separate there names via coma :'
-drivers = gets().chomp.split(',').map {|i| i.strip}.uniq & allowed_drivers
+LOGIN_PAGE = 'http://demoapp.strongqa.com/users/sign_in'.freeze
+HOME_PAGE = 'http://demoapp.strongqa.com/'.freeze
+
+allowed_drivers = %w[capybara selenium watir]
+puts 'Enter drivers names you want to use for the test, separate'\
+'their names via coma :'
+drivers = gets.chomp.split(',').map(&:strip).uniq & allowed_drivers
 
 tests = lambda do
   test_case 'tc_01', 'User can open login page via menu' do
@@ -65,14 +69,18 @@ tests = lambda do
   end
 end
 
-puts drivers.empty? ? "Drivers haven't been chosen" : "Tests will run for: #{drivers.join(', ')}"
-drivers.each do |i|
-  case i
-    when 'capybara'
-      capybara_test_run &tests
-    when 'selenium'
-      selenium_test_run &tests
-    when 'watir'
-      watir_test_run &tests
+if drivers.empty?
+  puts "Drivers haven't been chosen"
+else
+  puts "Tests will run for: #{drivers.join(', ')}"
+end
+drivers.each do |driver|
+  case driver
+  when 'capybara'
+    capybara_test_run &tests
+  when 'selenium'
+    selenium_test_run &tests
+  when 'watir'
+    watir_test_run &tests
   end
 end

@@ -1,0 +1,13 @@
+Layout/EndOfLine:
+  Exclude:
+    - 'Gemfile'
+
+# Offense count: 3
+Lint/AmbiguousOperator:
+  Exclude:
+    - 'test.rb'
+
+# Offense count: 1
+# Configuration parameters: CountComments, ExcludedMethods.
+Metrics/BlockLength:
+  Max: 48
